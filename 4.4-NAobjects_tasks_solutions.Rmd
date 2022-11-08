@@ -1,0 +1,220 @@
+---
+title: "First R Markdown sheet and R basics"
+author: "Luciano Gabbanelli"
+date: "October 2022"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    collapse: true
+    smooth_scroll: true
+    theme: journal
+    highlight: kate
+    df_print: paged
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+## Non-atomic objects
+
+
+### 1. Predict outputs
+
+```{r}
+
+## Some more examples. Manipulate letters and numbers.
+## You can name indexes of the vectors, and then call them by their names:
+a_list <- list(Numbers=1:15,Letters=letters[1:15]); print(a_list)
+
+## Initialize a list and then fill it:
+b_list <- list()
+b_list[[1]] <- "Let's code"
+b_list[[4]] <- FALSE
+b_list[[5]] <- pi
+
+## Outpus:
+print(a_list)
+typeof(a_list[[1]])
+typeof(a_list[1])
+mode(a_list$Numbers)
+is.vector(a_list$letters)
+is.vector(a_list$Letters)
+is.character(a_list$Letters)
+is.atomic(a_list$Letters)
+
+typeof(b_list[[4]])
+class(b_list[[5]])
+b_list[c(1,2,5)]
+typeof(b_list[[2]])
+
+## atributes shows the main characteristics of an object
+attributes(a_list)
+attributes(b_list)
+
+b_list
+```
+
+
+### 2. Census
+
+```{r}
+family_head <- list(name = "Casandra", surname = "Mendizabal", partner_name = "Arden", married = T, num_children = 4, children_ages = c(3,7,11,17), children_names = c('Denis', 'Farah', 'Jessie', 'Uri'), city = 'Barcelona')
+
+family_head
+print(family_head$married)
+print(family_head$city)
+family_head$children_names[c(2,4)]
+
+children <- list(names=family_head$children_names, ages=family_head$children_ages)
+children
+
+attributes(children)
+```
+
+
+### 3. DNI
+
+```{r}
+c(rep(5, 5),rep(3, 3))
+# I cannot do this with vectors. Vectors can not cointain vectors. 
+# The elements are treated in equal foot 
+list(rep(5, 5), rep(3, 3), rep(7, 7), rep(0,0),
+  rep(9, 9), rep(6, 6), rep(1, 1)
+)
+
+# With letters
+myLetters <- letters[1:26]
+
+list(rep("Y", match("y", myLetters)), rep(5, 5), rep(3, 3), rep(7, 7), rep(0,0),
+  rep(9, 9), rep(6, 6), rep(1, 1), rep("Q", match("q", myLetters))
+)
+
+
+```
+
+# 4. Ages
+
+```{r}
+set.seed(99)
+ages <- round(runif(20, min = 20, max = 40)); ages
+SS <- rep(c(F,T),10);SS
+list_data <- list(Age=ages,Social_security=SS)
+
+list_data
+length(list_data$Social_security)
+length(list_data$Age)
+
+ages[duplicated(ages)]
+unique(ages[duplicated(ages)])
+# or accessing from the list:
+list_data$Age[duplicated(list_data$Age)]
+unique(list_data$Age[duplicated(list_data$Age)])
+
+## I can create a table with no need to pass my vector as a factor
+list_data$Age
+table_freq <- table(list_data$Age);table_freq
+table_freq[table_freq>1]
+
+table(list_data$Social_security)
+
+# Create an histogram:
+list_data$Age
+barplot(table_freq, ylim= c(0,4), main = "Ages of random people", xlab = "Age", ylab = "Counts", col="blue", density=30)
+
+mean(list_data$Age)
+sd(list_data$Age)
+
+strd_dev_hand <- sqrt( sum((list_data$Age-mean(list_data$Age))^2) / (length(list_data$Age)-1))
+strd_dev_hand
+sd(list_data$Age) == strd_dev_hand
+
+```
+
+
+# 5. Cars
+
+```{r}
+cars <- as.factor(rep(c( "ELECTRIC", "GASOLINE", "DIESEL"), 5))
+cars
+levels(cars)
+cars.dropped <- droplevels(x = cars, exclude = "GASOLINE")
+cars.dropped
+
+levels(cars.dropped)
+
+```
+
+
+# 6. Fever
+
+```{r}
+fever = c(34,36,43,40,38,37,36,40,41,37,40,38,36,43,43,40,45,37,31,38,37)
+length(fever)
+fever
+table(fever)
+
+fever.factor = factor(fever,levels=c(36:42),ordered=TRUE)
+fever.factor
+
+length(fever.factor)
+attributes(fever.factor)
+summary(fever.factor)
+table(fever.factor)
+barplot(table(fever.factor))
+
+```
+
+## 7. Factors
+
+```{r}
+one_vector <- c(100,105,99,101,99,NA,100,99,NA,105,99,101,105,100,101,31)
+one_factor <- factor(one_vector, levels = c(99,100,101,102,103,104,105))
+one_factor
+levels(one_factor)
+
+levels(one_factor)[1] = "e"
+one_factor
+levels(one_factor)
+table(one_factor)
+
+set.seed(7)
+another_vector <- sample(99:105, size=length(one_vector), replace=TRUE)
+another_vector
+another_factor <- factor(another_vector)
+another_factor
+table(another_factor)
+
+
+levels(one_factor)
+levels(one_factor)[one_factor]
+# Concatenate without levels:
+factor(c(levels(one_factor)[one_factor], levels(another_factor)[another_factor]))
+# Concatenate with levels:
+both_factors = factor(c(levels(one_factor)[one_factor], levels(another_factor)[another_factor]), levels =  levels(one_factor))
+both_factors
+
+# Ocurrencies:
+table(both_factors)
+
+```
+
+
+
+# 8. Grep function 
+
+```{r}
+grep("b", c("abcdef", "2345", "bdazw", "zcca a", "abdy", "yyb+."))
+grep("b", c("abcdef", "2345", "bdazw", "zcca a", "abdy", "yyb+."), value=TRUE)
+
+grep("b+.", c("abcdef", "2345", "bdazw", "zcca a", "abdy", "yyb+."))
+grep("b+.", c("abcdef", "2345", "bdazw", "zcca a", "abdy", "yyb+."), fixed=TRUE)
+
+grep("bd", c("abcdef", "2345", "bdazw", "zcca a", "abdy", "yyb+."), value=TRUE)
+grep("b|d", c("abcdef", "2345", "bdazw", "zcca a", "abdy", "yyb+."), value=TRUE)
+
+```
